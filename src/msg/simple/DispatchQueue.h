@@ -90,7 +90,7 @@ class DispatchQueue {
 
   uint64_t next_pipe_id;
     
-  enum { D_CONNECT = 1, D_ACCEPT, D_BAD_REMOTE_RESET, D_BAD_RESET, D_NUM_CODES };
+  enum { D_CONNECT = 1, D_ACCEPT, D_BAD_REMOTE_RESET, D_BAD_RESET, D_CONN_REFUSED, D_NUM_CODES };
 
   /**
    * The DispatchThread runs dispatch_entry to empty out the dispatch_queue.
@@ -172,6 +172,16 @@ class DispatchQueue {
       0,
       CEPH_MSG_PRIO_HIGHEST,
       QueueItem(D_BAD_RESET, con));
+    cond.Signal();
+  }
+  void queue_refused(Connection *con) {
+    Mutex::Locker l(lock);
+    if (stop)
+      return;
+    mqueue.enqueue_strict(
+      0,
+      CEPH_MSG_PRIO_HIGHEST,
+      QueueItem(D_CONN_REFUSED, con));
     cond.Signal();
   }
 
