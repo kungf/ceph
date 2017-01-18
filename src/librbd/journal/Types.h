@@ -35,7 +35,8 @@ enum EventType {
   EVENT_TYPE_RENAME         = 10,
   EVENT_TYPE_RESIZE         = 11,
   EVENT_TYPE_FLATTEN        = 12,
-  EVENT_TYPE_DEMOTE         = 13
+  EVENT_TYPE_DEMOTE         = 13,
+  EVENT_TYPE_QOS_SET	     = 18
 };
 
 struct AioDiscardEvent {
@@ -205,6 +206,24 @@ struct SnapUnprotectEvent : public SnapEventBase {
   using SnapEventBase::dump;
 };
 
+struct QosSetEvent : public OpEventBase {
+  static const EventType TYPE = EVENT_TYPE_QOS_SET;
+  uint64_t iops_burst;
+  uint64_t iops_avg;
+  uint64_t bps_burst;
+  uint64_t bps_avg;
+
+  QosSetEvent() {
+  }
+  QosSetEvent(uint64_t op_tid, const uint64_t _iops_burst, uint64_t _iops_avg, uint64_t _bps_burst, uint64_t _bps_avg)
+    : OpEventBase(op_tid), iops_burst(_iops_burst), iops_avg(_iops_avg), bps_burst(_bps_burst), bps_avg(_bps_avg) {
+  }
+
+  void encode(bufferlist& bl) const;
+  void decode(__u8 version, bufferlist::iterator& it);
+  void dump(Formatter *f) const;
+};
+
 struct SnapRollbackEvent : public SnapEventBase {
   static const EventType TYPE = EVENT_TYPE_SNAP_ROLLBACK;
 
@@ -294,6 +313,7 @@ typedef boost::variant<AioDiscardEvent,
                        ResizeEvent,
                        FlattenEvent,
                        DemoteEvent,
+                       QosSetEvent,
                        UnknownEvent> Event;
 
 struct EventEntry {

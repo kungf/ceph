@@ -27,6 +27,7 @@
 #include "librbd/AsyncRequest.h"
 #include "librbd/SnapInfo.h"
 #include "librbd/parent_types.h"
+#include "librbd/Throttle.h"
 
 class CephContext;
 class ContextWQ;
@@ -82,6 +83,9 @@ namespace librbd {
     ImageWatcher<ImageCtx> *image_watcher;
     Journal<ImageCtx> *journal;
 
+    TokenBucketThrottle *m_iops_throttle;
+    TokenBucketThrottle *m_read_iops_throttle;
+    TokenBucketThrottle *m_write_iops_throttle;
     /**
      * Lock ordering:
      *
@@ -252,6 +256,8 @@ namespace librbd {
     bool test_flags(uint64_t test_flags) const;
     bool test_flags(uint64_t test_flags, const RWLock &in_snap_lock) const;
     int update_flags(librados::snap_t in_snap_id, uint64_t flag, bool enabled);
+
+    void qos_set(uint64_t iops_burst, uint64_t iops_avg, uint64_t bps_burst, uint64_t bps_avg);
 
     const parent_info* get_parent_info(librados::snap_t in_snap_id) const;
     int64_t get_parent_pool_id(librados::snap_t in_snap_id) const;

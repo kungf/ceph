@@ -120,6 +120,10 @@ void AioImageRequestWQ::aio_read(AioCompletion *c, uint64_t off, uint64_t len,
     RWLock::RLocker locker(m_lock);
     lock_required = m_require_lock_on_read;
   }
+  if (m_image_ctx.m_iops_throttle != NULL)
+    m_image_ctx.m_iops_throttle->get(1);
+  if (m_image_ctx.m_read_iops_throttle != NULL)
+    m_image_ctx.m_read_iops_throttle->get(1);
 
   if (m_image_ctx.non_blocking_aio || writes_blocked() || !writes_empty() ||
       lock_required) {
@@ -148,6 +152,10 @@ void AioImageRequestWQ::aio_write(AioCompletion *c, uint64_t off, uint64_t len,
     return;
   }
 
+  if (m_image_ctx.m_iops_throttle != NULL)
+    m_image_ctx.m_iops_throttle->get(1);
+  if (m_image_ctx.m_write_iops_throttle != NULL)
+    m_image_ctx.m_write_iops_throttle->get(1);
   RWLock::RLocker owner_locker(m_image_ctx.owner_lock);
   if (m_image_ctx.non_blocking_aio || writes_blocked()) {
     queue(new AioImageWrite<>(m_image_ctx, c, off, len, buf, op_flags));

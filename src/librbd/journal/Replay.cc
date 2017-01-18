@@ -85,6 +85,11 @@ struct ExecuteOp : public Context {
                                           on_op_complete);
   }
 
+
+  void execute(const journal::QosSetEvent &_) {
+    image_ctx.operations->execute_qos_set(event.iops_burst, event.iops_avg, event.bps_burst, event.bps_avg, on_op_complete);
+  }
+
   virtual void finish(int r) override {
     CephContext *cct = image_ctx.cct;
     if (r < 0) {
@@ -630,6 +635,28 @@ void Replay<I>::handle_event(const journal::DemoteEvent &event,
   ldout(cct, 20) << ": Demote event" << dendl;
   on_ready->complete(0);
   on_safe->complete(0);
+}
+
+template <typename I>
+void Replay<I>::handle_event(const journal::QosSetEvent &event,
+			     Context *on_ready, Context *on_safe) {
+  CephContext *cct = m_image_ctx.cct;
+  ldout(cct, 20) << ": Qos set event" << dendl;
+
+  Mutex::Locker locker(m_lock);
+  OpEvent *op_event;
+  Context *on_op_complete = create_op_context_callback(event.op_tid, on_ready,
+                                                       on_safe, &op_event);
+  if (on_op_complete == nullptr) {
+    return;
+  }
+
+  op_event->on_op_finish_event = new C_RefreshIfRequired<I>(
+    m_image_ctx, new ExecuteOp<I, journal::QosSetEvent>(m_image_ctx,
+							   event,
+							   on_op_complete));
+
+  on_ready->complete(0);
 }
 
 template <typename I>

@@ -288,6 +288,38 @@ void ImageState<I>::close(Context *on_finish) {
 }
 
 template <typename I>
+void ImageState<I>::prepare_lock(Context *on_ready) {
+  CephContext *cct = m_image_ctx->cct;
+  ldout(cct, 10) << __func__ << dendl;
+
+  m_lock.Lock();
+  if (is_closed()) {
+    m_lock.Unlock();
+    on_ready->complete(-ESHUTDOWN);
+    return;
+  }
+
+  Action action(ACTION_TYPE_LOCK);
+  action.on_ready = on_ready;
+  execute_action_unlock(action, nullptr);
+}
+
+template <typename I>
+void ImageState<I>::handle_prepare_lock_complete() {
+  CephContext *cct = m_image_ctx->cct;
+  ldout(cct, 10) << __func__ << dendl;
+
+  m_lock.Lock();
+  if (m_state != STATE_PREPARING_LOCK) {
+    m_lock.Unlock();
+    return;
+  }
+
+  complete_action_unlock(STATE_OPEN, 0); 
+}
+
+
+template <typename I>
 void ImageState<I>::handle_update_notification() {
   Mutex::Locker locker(m_lock);
   ++m_refresh_seq;

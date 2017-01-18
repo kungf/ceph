@@ -141,6 +141,9 @@ namespace librbd {
              bool force=false);
   int snap_list(ImageCtx *ictx, std::vector<snap_info_t>& snaps);
   int snap_exists(ImageCtx *ictx, const char *snap_name, bool *exists);
+  int qos_get(ImageCtx *ictx, uint64_t *iops_burst, uint64_t *iops_avg, uint64_t *bps_burst, uint64_t *bps_avg);
+  int qos_set(ImageCtx *ictx, uint64_t iops_burst, uint64_t iops_avg, uint64_t bps_burst, uint64_t bps_avg);
+  int snap_set_limit(ImageCtx *ictx, uint64_t limit);
   int snap_is_protected(ImageCtx *ictx, const char *snap_name,
 			bool *is_protected);
   int copy(ImageCtx *ictx, IoCtx& dest_md_ctx, const char *destname,

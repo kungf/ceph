@@ -14,6 +14,7 @@ set(librbd_internal_srcs
   CopyupRequest.cc
   DiffIterate.cc
   ExclusiveLock.cc
+  Throttle.cc
   ImageCtx.cc
   ImageState.cc
   ImageWatcher.cc
@@ -59,6 +60,7 @@ set(librbd_internal_srcs
   operation/SnapshotRenameRequest.cc
   operation/SnapshotRollbackRequest.cc
   operation/SnapshotUnprotectRequest.cc
+  operation/QosRequest.cc
   operation/TrimRequest.cc)
 
 add_library(rbd_api STATIC librbd.cc)

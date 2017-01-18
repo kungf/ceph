@@ -154,6 +154,30 @@ void SnapEventBase::dump(Formatter *f) const {
   f->dump_string("snap_name", snap_name);
 }
 
+void QosSetEvent::encode(bufferlist &bl) const {
+  OpEventBase::encode(bl);
+  ::encode(iops_burst, bl);
+  ::encode(iops_avg, bl);
+  ::encode(bps_burst, bl);
+  ::encode(bps_avg, bl);
+}
+
+void QosSetEvent::decode(__u8 version, bufferlist::iterator& it) {
+  OpEventBase::decode(version, it);
+  ::decode(iops_burst, it);
+  ::decode(iops_avg, it);
+  ::decode(bps_burst, it);
+  ::decode(bps_avg, it);
+}
+
+void QosSetEvent::dump(Formatter *f) const {
+  OpEventBase::dump(f);
+  f->dump_unsigned("iops_burst", iops_burst);
+  f->dump_unsigned("iops_avg", iops_avg);
+  f->dump_unsigned("bps_burst", bps_burst);
+  f->dump_unsigned("bps_avg", bps_avg);
+}
+
 void SnapRenameEvent::encode(bufferlist& bl) const {
   SnapEventBase::encode(bl);
   ::encode(snap_id, bl);

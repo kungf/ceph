@@ -43,6 +43,8 @@ struct MockOperations {
                                           Context *on_finish));
   MOCK_METHOD2(execute_snap_unprotect, void(const std::string &snap_name,
                                             Context *on_finish));
+  MOCK_METHOD5(execute_qos_set, void(uint64_t iops_burst, uint64_t iops_avg, uint64_t bps_burst, uint64_t bps_avg,
+					    Context *on_finish));
 };
 
 } // namespace librbd

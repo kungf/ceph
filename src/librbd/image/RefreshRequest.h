@@ -114,6 +114,7 @@ private:
   uint64_t m_features;
   uint64_t m_incompatible_features;
   uint64_t m_flags;
+  uint64_t m_iops_burst, m_iops_avg, m_bps_burst, m_bps_avg;
   std::string m_object_prefix;
   parent_info m_parent_md;
 
@@ -146,6 +147,9 @@ private:
 
   void send_v2_get_mutable_metadata();
   Context *handle_v2_get_mutable_metadata(int *result);
+
+  void send_v2_get_qos();
+  Context *handle_v2_get_qos(int *result);
 
   void send_v2_get_flags();
   Context *handle_v2_get_flags(int *result);

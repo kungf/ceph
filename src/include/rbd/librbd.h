@@ -356,6 +356,11 @@ CEPH_RBD_API int rbd_snap_unprotect(rbd_image_t image, const char *snap_name);
  */
 CEPH_RBD_API int rbd_snap_is_protected(rbd_image_t image, const char *snap_name,
 			               int *is_protected);
+
+CEPH_RBD_API int rbd_qos_set(rbd_image_t image, uint64_t iops_burst, uint64_t iops_avg, uint64_t bps_burst, uint64_t bps_avg);
+
+CEPH_RBD_API int rbd_qos_get(rbd_image_t image, uint64_t *iops_burst, uint64_t *iops_avg, uint64_t *bps_burst, uint64_t *bps_avg);
+
 CEPH_RBD_API int rbd_snap_set(rbd_image_t image, const char *snapname);
 
 CEPH_RBD_API int rbd_flatten(rbd_image_t image);

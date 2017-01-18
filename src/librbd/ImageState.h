@@ -42,6 +42,9 @@ public:
 
   void snap_set(const std::string &snap_name, Context *on_finish);
 
+  void prepare_lock(Context *on_ready);
+  void handle_prepare_lock_complete();
+
   int register_update_watcher(UpdateWatchCtx *watcher, uint64_t *handle);
   int unregister_update_watcher(uint64_t handle);
   void flush_update_watchers(Context *on_finish);
@@ -55,14 +58,16 @@ private:
     STATE_OPENING,
     STATE_CLOSING,
     STATE_REFRESHING,
-    STATE_SETTING_SNAP
+    STATE_SETTING_SNAP,
+    STATE_PREPARING_LOCK
   };
 
   enum ActionType {
     ACTION_TYPE_OPEN,
     ACTION_TYPE_CLOSE,
     ACTION_TYPE_REFRESH,
-    ACTION_TYPE_SET_SNAP
+    ACTION_TYPE_SET_SNAP,
+    ACTION_TYPE_LOCK
   };
 
   struct Action {
@@ -70,6 +75,7 @@ private:
     uint64_t refresh_seq = 0;
     bool refresh_acquiring_lock = false;
     std::string snap_name;
+    Context *on_ready = nullptr;
 
     Action(ActionType action_type) : action_type(action_type) {
     }

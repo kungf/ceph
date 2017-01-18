@@ -992,6 +992,22 @@ namespace librbd {
     return r;
   }
 
+  int Image::qos_set(uint64_t iops_burst, uint64_t iops_avg, uint64_t bps_burst, uint64_t bps_avg)
+  {
+    ImageCtx *ictx = (ImageCtx *)ctx;
+
+    int r = ictx->operations->qos_set(iops_burst, iops_avg, bps_burst, bps_avg);
+    return r;
+  }
+
+  int Image::qos_get(uint64_t *iops_burst, uint64_t *iops_avg, uint64_t *bps_burst, uint64_t *bps_avg)
+  {
+    ImageCtx *ictx = (ImageCtx *)ctx;
+
+    int r = librbd::qos_get(ictx, iops_burst, iops_avg, bps_burst, bps_avg);
+    return r;
+  }
+
   int Image::snap_set(const char *snap_name)
   {
     ImageCtx *ictx = (ImageCtx *)ctx;
@@ -2247,6 +2263,20 @@ extern "C" int rbd_snap_is_protected(rbd_image_t image, const char *snap_name,
   *is_protected = protected_snap ? 1 : 0;
   tracepoint(librbd, snap_is_protected_exit, 0, *is_protected ? 1 : 0);
   return 0;
+}
+
+extern "C" int rbd_qos_set(rbd_image_t image, uint64_t iops_burst, uint64_t iops_avg, uint64_t bps_burst, uint64_t bps_avg)
+{
+  librbd::ImageCtx *ictx = (librbd::ImageCtx *)image;
+  int r = librbd::qos_set(ictx, iops_burst, iops_avg, bps_burst, bps_avg);
+  return r;
+}
+
+extern "C" int rbd_qos_get(rbd_image_t image, uint64_t *iops_burst, uint64_t *iops_avg, uint64_t *bps_burst, uint64_t *bps_avg)
+{
+  librbd::ImageCtx *ictx = (librbd::ImageCtx *)image;
+  int r = librbd::qos_get(ictx, iops_burst, iops_avg, bps_burst, bps_avg);
+  return r;
 }
 
 extern "C" int rbd_snap_set(rbd_image_t image, const char *snap_name)

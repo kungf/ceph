@@ -30,6 +30,7 @@ librbd_internal_la_SOURCES = \
 	librbd/ObjectMap.cc \
 	librbd/ObjectWatcher.cc \
 	librbd/Operations.cc \
+	librbd/Throttle.cc \
 	librbd/Utils.cc \
 	librbd/exclusive_lock/AcquireRequest.cc \
 	librbd/exclusive_lock/ReleaseRequest.cc \
@@ -54,6 +55,7 @@ librbd_internal_la_SOURCES = \
 	librbd/object_map/UnlockRequest.cc \
 	librbd/object_map/UpdateRequest.cc \
 	librbd/operation/FlattenRequest.cc \
+	librbd/operation/QosRequest.cc \
 	librbd/operation/RebuildObjectMapRequest.cc \
 	librbd/operation/RenameRequest.cc \
 	librbd/operation/Request.cc \
@@ -114,6 +116,7 @@ noinst_HEADERS += \
 	librbd/parent_types.h \
 	librbd/SnapInfo.h \
 	librbd/TaskFinisher.h \
+	librbd/Throttle.h \
 	librbd/Utils.h \
 	librbd/WatchNotifyTypes.h \
 	librbd/exclusive_lock/AcquireRequest.h \
@@ -145,6 +148,7 @@ noinst_HEADERS += \
 	librbd/object_map/UnlockRequest.h \
 	librbd/object_map/UpdateRequest.h \
 	librbd/operation/FlattenRequest.h \
+	librbd/operation/QosRequest.h \
 	librbd/operation/RebuildObjectMapRequest.h \
 	librbd/operation/RenameRequest.h \
 	librbd/operation/Request.h \

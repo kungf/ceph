@@ -184,6 +184,10 @@ struct C_InvalidateCache : public Context {
     ThreadPoolSingleton *thread_pool_singleton;
     cct->lookup_or_create_singleton_object<ThreadPoolSingleton>(
       thread_pool_singleton, "librbd::thread_pool");
+    m_iops_throttle = new TokenBucketThrottle(cct, 0, 0);
+    m_read_iops_throttle = new TokenBucketThrottle(cct, 0, 0);
+    m_write_iops_throttle = new TokenBucketThrottle(cct, 0, 0);
+
     aio_work_queue = new AioImageRequestWQ(this, "librbd::aio_work_queue",
                                            cct->_conf->rbd_op_thread_timeout,
                                            thread_pool_singleton);
@@ -224,6 +228,12 @@ struct C_InvalidateCache : public Context {
     op_work_queue->drain();
     aio_work_queue->drain();
 
+    if (m_iops_throttle != NULL)
+      delete m_iops_throttle;
+    if (m_read_iops_throttle != NULL)
+      delete m_read_iops_throttle;
+    if (m_write_iops_throttle != NULL)
+      delete m_write_iops_throttle;
     delete journal_policy;
     delete exclusive_lock_policy;
     delete op_work_queue;
@@ -614,6 +624,12 @@ struct C_InvalidateCache : public Context {
       (*_flags) &= ~flag;
     }
     return 0;
+  }
+
+  void ImageCtx::qos_set(uint64_t iops_burst, uint64_t iops_avg, uint64_t bps_burst, uint64_t bps_avg)
+  {
+    m_iops_throttle->set_max(iops_burst);
+    m_iops_throttle->set_avg(iops_avg);
   }
 
   const parent_info* ImageCtx::get_parent_info(snap_t in_snap_id) const

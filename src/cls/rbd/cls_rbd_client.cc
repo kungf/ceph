@@ -660,6 +660,55 @@ namespace librbd {
       op->exec("rbd", "set_protection_status", in);
     }
 
+    void qos_get_start(librados::ObjectReadOperation *op) {
+      bufferlist empty_bl;
+      op->exec("rbd", "qos_get", empty_bl);
+    }
+
+    int qos_get_finish(bufferlist::iterator *it,
+			   uint64_t *iops_burst, uint64_t *iops_avg,
+			   uint64_t *bps_burst, uint64_t *bps_avg)
+    {
+      try {
+	::decode(*iops_burst, *it);
+	::decode(*iops_avg, *it);
+	::decode(*bps_burst, *it);
+	::decode(*bps_avg, *it);
+      } catch (const buffer::error &err) {
+	return -EBADMSG;
+      }
+      return 0;
+    }
+
+    int qos_get(librados::IoCtx *ioctx, const std::string &oid,
+		uint64_t *iops_burst, uint64_t *iops_avg,
+	        uint64_t *bps_burst, uint64_t *bps_avg)
+    {
+      librados::ObjectReadOperation op;
+      qos_get_start(&op);
+
+      bufferlist out_bl;
+      int r = ioctx->operate(oid, &op, &out_bl);
+      if (r < 0) {
+        return r;
+      }
+
+      bufferlist::iterator it = out_bl.begin();
+      return qos_get_finish(&it, iops_burst, iops_avg, bps_burst, bps_avg);
+    }
+
+    void qos_set(librados::ObjectWriteOperation *op,
+		  uint64_t iops_burst, uint64_t iops_avg,
+		  uint64_t bps_burst, uint64_t bps_avg)
+    {
+      bufferlist in;
+      ::encode(iops_burst, in);
+      ::encode(iops_avg, in);
+      ::encode(bps_burst, in);
+      ::encode(bps_avg, in);
+      op->exec("rbd", "qos_set", in);
+    }
+
     void get_stripe_unit_count_start(librados::ObjectReadOperation *op) {
       bufferlist empty_bl;
       op->exec("rbd", "get_stripe_unit_count", empty_bl);
