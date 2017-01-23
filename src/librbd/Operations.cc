@@ -1115,7 +1115,7 @@ void Operations<I>::execute_snap_unprotect(const std::string &snap_name,
 }
 
 template <typename I>
-int Operations<I>::qos_set(uint64_t iops_burst, uint64_t iops_avg, uint64_t bps_burst, uint64_t bps_avg) {
+int Operations<I>::qos_set(uint64_t iops_burst, uint64_t iops_avg, uint64_t bps_burst, uint64_t bps_avg, std::string& type) {
   CephContext *cct = m_image_ctx.cct;
   ldout(cct, 5) << this << " " << __func__ << ": iops_burst=" << iops_burst << dendl;
 
@@ -1143,7 +1143,7 @@ int Operations<I>::qos_set(uint64_t iops_burst, uint64_t iops_avg, uint64_t bps_
       }
     }
 
-    execute_qos_set(iops_burst, iops_avg, bps_burst, bps_avg, &limit_ctx);
+    execute_qos_set(iops_burst, iops_avg, bps_burst, bps_avg, type, &limit_ctx);
     r = limit_ctx.wait();
   }
 
@@ -1151,12 +1151,12 @@ int Operations<I>::qos_set(uint64_t iops_burst, uint64_t iops_avg, uint64_t bps_
 }
 
 template <typename I>
-void Operations<I>::execute_qos_set(uint64_t iops_burst, uint64_t iops_avg, uint64_t bps_burst, uint64_t bps_avg,
+void Operations<I>::execute_qos_set(uint64_t iops_burst, uint64_t iops_avg, uint64_t bps_burst, uint64_t bps_avg, std::string& type,
 					   Context *on_finish) {
   assert(m_image_ctx.owner_lock.is_locked());
 
   operation::QosRequest<I> *request =
-    new operation::QosRequest<I>(m_image_ctx, on_finish, iops_burst, iops_avg, bps_burst, bps_avg);
+    new operation::QosRequest<I>(m_image_ctx, on_finish, iops_burst, iops_avg, bps_burst, bps_avg, type);
   request->send();
 }
 

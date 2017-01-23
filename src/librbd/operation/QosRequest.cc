@@ -26,9 +26,9 @@ template <typename I>
 QosRequest<I>::QosRequest(I &image_ctx,
 			  Context *on_finish,
 			  uint64_t iops_burst, uint64_t iops_avg,
-			  uint64_t bps_burst, uint64_t bps_avg)
+			  uint64_t bps_burst, uint64_t bps_avg, std::string& type)
   : Request<I>(image_ctx, on_finish), m_iops_burst(iops_burst), m_iops_avg(iops_avg),
-    m_bps_burst(bps_burst), m_bps_avg(bps_avg) {
+    m_bps_burst(bps_burst), m_bps_avg(bps_avg), m_type(type) {
 }
 
 template <typename I>
@@ -122,7 +122,7 @@ void QosRequest<I>::send_qos_request() {
     RWLock::RLocker md_locker(image_ctx.md_lock);
 
     librados::ObjectWriteOperation op;
-    cls_client::qos_set(&op, m_iops_burst, m_iops_avg, m_bps_burst, m_bps_avg);
+    cls_client::qos_set(&op, m_iops_burst, m_iops_avg, m_bps_burst, m_bps_avg, m_type);
 
     using klass = QosRequest<I>;
     librados::AioCompletion *rados_completion = create_rados_ack_callback<klass,

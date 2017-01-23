@@ -124,16 +124,16 @@ namespace librbd {
 			      snapid_t snap_id, uint8_t protection_status);
     void set_protection_status(librados::ObjectWriteOperation *op,
                                snapid_t snap_id, uint8_t protection_status);
-    void qos_get_start(librados::ObjectReadOperation *op);
+    void qos_get_start(librados::ObjectReadOperation *op, std::string *type);
     int qos_get_finish(bufferlist::iterator *it,
 			   uint64_t *iops_burst, uint64_t *iops_avg,
 			   uint64_t *bps_burst, uint64_t *bps_avg);
     int qos_get(librados::IoCtx *ioctx, const std::string &oid,
 		uint64_t *iops_burst, uint64_t *iops_avg,
-	        uint64_t *bps_burst, uint64_t *bps_avg);
+	        uint64_t *bps_burst, uint64_t *bps_avg, std::string *type);
     void qos_set(librados::ObjectWriteOperation *op,
 		  uint64_t iops_burst, uint64_t iops_avg,
-		  uint64_t bps_burst, uint64_t bps_avg);
+		  uint64_t bps_burst, uint64_t bps_avg, std::string& type);
 
     void get_stripe_unit_count_start(librados::ObjectReadOperation *op);
     int get_stripe_unit_count_finish(bufferlist::iterator *it,

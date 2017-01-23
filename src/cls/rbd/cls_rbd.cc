@@ -2685,45 +2685,137 @@ int qos_get(cls_method_context_t hctx, bufferlist *in,
   uint64_t iops_avg;
   uint64_t bps_burst;
   uint64_t bps_avg;
+  std::string type;
 
-  rc = read_key(hctx, "qos_iops_burst", &iops_burst);
-  if (rc == -ENOENT) {
-    rc = 0;
-    ::encode(UINT64_MAX, *out);
-  } else if (rc < 0) {
-    return rc;
-  } else {
-    ::encode(iops_burst, *out);
+  try {
+    bufferlist::iterator iter = in->begin();
+    ::decode(type, iter);
+  } catch (const buffer::error &err) {
+    return -EINVAL;
   }
 
-  rc = read_key(hctx, "qos_iops_avg", &iops_avg);
-  if (rc == -ENOENT) {
-    rc = 0;
-    ::encode(UINT64_MAX, *out);
-  } else if (rc < 0) {
-    return rc;
-  } else {
-    ::encode(iops_avg, *out);
-  }
+  if (type == "read"){
+  
+    rc = read_key(hctx, "qos_read_iops_burst", &iops_burst);
+    if (rc == -ENOENT) {
+      rc = 0;
+      ::encode(UINT64_MAX, *out);
+      } else if (rc < 0) {
+      return rc;
+    } else {
+      ::encode(iops_burst, *out);
+    }
 
-  rc = read_key(hctx, "qos_bps_burst", &bps_burst);
-  if (rc == -ENOENT) {
-    rc = 0;
-    ::encode(UINT64_MAX, *out);
-  } else if (rc < 0){
-    return rc;
-  } else {
-    ::encode(bps_burst, *out);
-  }
+    rc = read_key(hctx, "qos_read_iops_avg", &iops_avg);
+    if (rc == -ENOENT) {
+      rc = 0;
+      ::encode(UINT64_MAX, *out);
+    } else if (rc < 0) {
+      return rc;
+    } else {
+      ::encode(iops_avg, *out);
+    }
 
-  rc = read_key(hctx, "qos_bps_avg", &bps_avg);
-  if (rc == -ENOENT) {
-    rc = 0;
-    ::encode(UINT64_MAX, *out);
-  } else if (rc < 0) {
-    return rc;
+    rc = read_key(hctx, "qos_read_bps_burst", &bps_burst);
+    if (rc == -ENOENT) {
+      rc = 0;
+      ::encode(UINT64_MAX, *out);
+    } else if (rc < 0){
+      return rc;
+    } else {
+      ::encode(bps_burst, *out);
+    }
+
+    rc = read_key(hctx, "qos_read_bps_avg", &bps_avg);
+    if (rc == -ENOENT) {
+      rc = 0;
+      ::encode(UINT64_MAX, *out);
+    } else if (rc < 0) {
+      return rc;
+    } else {
+      ::encode(bps_avg, *out);
+    }
+ } else if (type == "write"){
+    rc = read_key(hctx, "qos_write_iops_burst", &iops_burst);
+    if (rc == -ENOENT) {
+      rc = 0;
+      ::encode(UINT64_MAX, *out);
+    } else if (rc < 0) {
+      return rc;
+    } else {
+      ::encode(iops_burst, *out);
+   }
+
+    rc = read_key(hctx, "qos_write_iops_avg", &iops_avg);
+    if (rc == -ENOENT) {
+      rc = 0;
+      ::encode(UINT64_MAX, *out);
+    } else if (rc < 0) {
+      return rc;
+    } else {
+      ::encode(iops_avg, *out);
+    }
+
+    rc = read_key(hctx, "qos_write_bps_burst", &bps_burst);
+    if (rc == -ENOENT) {
+      rc = 0;
+      ::encode(UINT64_MAX, *out);
+    } else if (rc < 0){
+      return rc;
+    } else {
+      ::encode(bps_burst, *out);
+    }
+
+    rc = read_key(hctx, "qos_write_bps_avg", &bps_avg);
+    if (rc == -ENOENT) {
+      rc = 0;
+      ::encode(UINT64_MAX, *out);
+    } else if (rc < 0) {
+      return rc;
+    } else {
+      ::encode(bps_avg, *out);
+    }
+  
   } else {
-    ::encode(bps_avg, *out);
+    rc = read_key(hctx, "qos_iops_burst", &iops_burst);
+    if (rc == -ENOENT) {
+      rc = 0;
+      ::encode(UINT64_MAX, *out);
+    } else if (rc < 0) {
+      return rc;
+    } else {
+      ::encode(iops_burst, *out);
+    }
+
+    rc = read_key(hctx, "qos_iops_avg", &iops_avg);
+    if (rc == -ENOENT) {
+      rc = 0;
+      ::encode(UINT64_MAX, *out);
+    } else if (rc < 0) {
+      return rc;
+    } else {
+      ::encode(iops_avg, *out);
+    }
+
+    rc = read_key(hctx, "qos_bps_burst", &bps_burst);
+    if (rc == -ENOENT) {
+      rc = 0;
+      ::encode(UINT64_MAX, *out);
+    } else if (rc < 0){
+      return rc;
+    } else {
+      ::encode(bps_burst, *out);
+    }
+
+    rc = read_key(hctx, "qos_bps_avg", &bps_avg);
+    if (rc == -ENOENT) {
+      rc = 0;
+      ::encode(UINT64_MAX, *out);
+    } else if (rc < 0) {
+      return rc;
+    } else {
+      ::encode(bps_avg, *out);
+    }
   }
 
   CLS_LOG(0, "read qos iops_burst:%lu, iops_avg:%lu, bps_burst:%lu, bps_avg:%lu", iops_burst, iops_avg, bps_burst, bps_avg);
@@ -2739,7 +2831,7 @@ int qos_set(cls_method_context_t hctx, bufferlist *in,
   uint64_t iops_avg;
   uint64_t bps_burst;
   uint64_t bps_avg;
-  bufferlist bl;
+  std::string type;
 
   try {
     bufferlist::iterator iter = in->begin();
@@ -2747,6 +2839,7 @@ int qos_set(cls_method_context_t hctx, bufferlist *in,
     ::decode(iops_avg, iter);
     ::decode(bps_burst, iter);
     ::decode(bps_avg, iter);
+    ::decode(type, iter);
   } catch (const buffer::error &err) {
     return -EINVAL;
   }
@@ -2757,10 +2850,23 @@ int qos_set(cls_method_context_t hctx, bufferlist *in,
   ::encode(bps_burst, bps_burst_bl);
   ::encode(bps_avg, bps_avg_bl);
   map<string, bufferlist> omap_vals;
+  if (type == "read") {
+  omap_vals["qos_read_iops_burst"] = iops_burst_bl;
+  omap_vals["qos_read_iops_avg"] = iops_avg_bl;
+  omap_vals["qos_read_bps_burst"] = bps_burst_bl;
+  omap_vals["qos_read_bps_avg"] = bps_avg_bl;
+  } else if(type == "write") {
+  omap_vals["qos_write_iops_burst"] = iops_burst_bl;
+  omap_vals["qos_write_iops_avg"] = iops_avg_bl;
+  omap_vals["qos_write_bps_burst"] = bps_burst_bl;
+  omap_vals["qos_write_bps_avg"] = bps_avg_bl;
+  } else {
   omap_vals["qos_iops_burst"] = iops_burst_bl;
   omap_vals["qos_iops_avg"] = iops_avg_bl;
   omap_vals["qos_bps_burst"] = bps_burst_bl;
   omap_vals["qos_bps_avg"] = bps_avg_bl;
+  }
+  
   rc = cls_cxx_map_set_vals(hctx, &omap_vals);
 
   return rc;

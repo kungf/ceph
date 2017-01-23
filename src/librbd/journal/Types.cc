@@ -160,6 +160,7 @@ void QosSetEvent::encode(bufferlist &bl) const {
   ::encode(iops_avg, bl);
   ::encode(bps_burst, bl);
   ::encode(bps_avg, bl);
+  ::encode(type, bl);
 }
 
 void QosSetEvent::decode(__u8 version, bufferlist::iterator& it) {
@@ -168,6 +169,7 @@ void QosSetEvent::decode(__u8 version, bufferlist::iterator& it) {
   ::decode(iops_avg, it);
   ::decode(bps_burst, it);
   ::decode(bps_avg, it);
+  ::decode(type, it);
 }
 
 void QosSetEvent::dump(Formatter *f) const {
@@ -176,6 +178,7 @@ void QosSetEvent::dump(Formatter *f) const {
   f->dump_unsigned("iops_avg", iops_avg);
   f->dump_unsigned("bps_burst", bps_burst);
   f->dump_unsigned("bps_avg", bps_avg);
+  f->dump_string("type", type);
 }
 
 void SnapRenameEvent::encode(bufferlist& bl) const {

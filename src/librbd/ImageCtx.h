@@ -257,7 +257,7 @@ namespace librbd {
     bool test_flags(uint64_t test_flags, const RWLock &in_snap_lock) const;
     int update_flags(librados::snap_t in_snap_id, uint64_t flag, bool enabled);
 
-    void qos_set(uint64_t iops_burst, uint64_t iops_avg, uint64_t bps_burst, uint64_t bps_avg);
+    void qos_set(uint64_t iops_burst, uint64_t iops_avg, uint64_t bps_burst, uint64_t bps_avg, std::string& type);
 
     const parent_info* get_parent_info(librados::snap_t in_snap_id) const;
     int64_t get_parent_pool_id(librados::snap_t in_snap_id) const;

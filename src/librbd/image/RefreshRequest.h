@@ -115,6 +115,11 @@ private:
   uint64_t m_incompatible_features;
   uint64_t m_flags;
   uint64_t m_iops_burst, m_iops_avg, m_bps_burst, m_bps_avg;
+  uint64_t m_read_iops_burst, m_read_iops_avg, m_read_bps_burst, m_read_bps_avg;
+  uint64_t m_write_iops_burst, m_write_iops_avg, m_write_bps_burst, m_write_bps_avg;
+  std::string read_type = "read";
+  std::string write_type = "write";
+  std::string all_type = "all";
   std::string m_object_prefix;
   parent_info m_parent_md;
 
@@ -150,6 +155,12 @@ private:
 
   void send_v2_get_qos();
   Context *handle_v2_get_qos(int *result);
+
+  void send_v2_get_read_qos();
+  Context *handle_v2_get_read_qos(int *result);
+
+  void send_v2_get_write_qos();
+  Context *handle_v2_get_write_qos(int *result);
 
   void send_v2_get_flags();
   Context *handle_v2_get_flags(int *result);

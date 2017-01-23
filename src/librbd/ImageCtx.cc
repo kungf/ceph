@@ -626,10 +626,18 @@ struct C_InvalidateCache : public Context {
     return 0;
   }
 
-  void ImageCtx::qos_set(uint64_t iops_burst, uint64_t iops_avg, uint64_t bps_burst, uint64_t bps_avg)
+  void ImageCtx::qos_set(uint64_t iops_burst, uint64_t iops_avg, uint64_t bps_burst, uint64_t bps_avg, std::string& type)
   {
-    m_iops_throttle->set_max(iops_burst);
-    m_iops_throttle->set_avg(iops_avg);
+    if (type == "read"){
+      m_read_iops_throttle->set_max(iops_burst);
+      m_read_iops_throttle->set_avg(iops_avg);
+    }else if(type == "write"){
+      m_write_iops_throttle->set_max(iops_burst);
+      m_write_iops_throttle->set_avg(iops_avg);
+    }else{
+      m_iops_throttle->set_max(iops_burst);
+      m_iops_throttle->set_avg(iops_avg);
+    }
   }
 
   const parent_info* ImageCtx::get_parent_info(snap_t in_snap_id) const

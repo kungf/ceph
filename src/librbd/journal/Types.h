@@ -212,11 +212,12 @@ struct QosSetEvent : public OpEventBase {
   uint64_t iops_avg;
   uint64_t bps_burst;
   uint64_t bps_avg;
+  std::string type;
 
   QosSetEvent() {
   }
-  QosSetEvent(uint64_t op_tid, const uint64_t _iops_burst, uint64_t _iops_avg, uint64_t _bps_burst, uint64_t _bps_avg)
-    : OpEventBase(op_tid), iops_burst(_iops_burst), iops_avg(_iops_avg), bps_burst(_bps_burst), bps_avg(_bps_avg) {
+  QosSetEvent(uint64_t op_tid, const uint64_t _iops_burst, uint64_t _iops_avg, uint64_t _bps_burst, uint64_t _bps_avg, std::string type)
+    : OpEventBase(op_tid), iops_burst(_iops_burst), iops_avg(_iops_avg), bps_burst(_bps_burst), bps_avg(_bps_avg), type(type) {
   }
 
   void encode(bufferlist& bl) const;

@@ -59,8 +59,8 @@ public:
   int snap_unprotect(const char *snap_name);
   void execute_snap_unprotect(const std::string &snap_name, Context *on_finish);
 
-  int qos_set(uint64_t iops_burst, uint64_t iops_avg, uint64_t bps_burst, uint64_t bps_avg);
-  void execute_qos_set(uint64_t iops_burst, uint64_t iops_avg, uint64_t bps_burst, uint64_t bps_avg, Context *on_finish);
+  int qos_set(uint64_t iops_burst, uint64_t iops_avg, uint64_t bps_burst, uint64_t bps_avg, std::string& type);
+  void execute_qos_set(uint64_t iops_burst, uint64_t iops_avg, uint64_t bps_burst, uint64_t bps_avg, std::string& type, Context *on_finish);
 
   int prepare_image_update();
 

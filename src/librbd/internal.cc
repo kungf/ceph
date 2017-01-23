@@ -2313,9 +2313,9 @@ int mirror_image_disable_internal(ImageCtx *ictx, bool force,
     return 0;
   }
 
-  int qos_get(ImageCtx *ictx, uint64_t *iops_burst, uint64_t *iops_avg, uint64_t *bps_burst, uint64_t *bps_avg)
+  int qos_get(ImageCtx *ictx, uint64_t *iops_burst, uint64_t *iops_avg, uint64_t *bps_burst, uint64_t *bps_avg, std::string *type)
   {
-    int r = cls_client::qos_get(&ictx->md_ctx, ictx->header_oid, iops_burst, iops_avg, bps_burst, bps_avg);
+    int r = cls_client::qos_get(&ictx->md_ctx, ictx->header_oid, iops_burst, iops_avg, bps_burst, bps_avg, type);
     if (r == -EOPNOTSUPP) {
       *iops_burst = UINT64_MAX;
       *iops_avg = UINT64_MAX;
@@ -2326,9 +2326,9 @@ int mirror_image_disable_internal(ImageCtx *ictx, bool force,
     return r;
   }
 
-  int qos_set(ImageCtx *ictx, uint64_t iops_burst, uint64_t iops_avg, uint64_t bps_burst, uint64_t bps_avg)
+  int qos_set(ImageCtx *ictx, uint64_t iops_burst, uint64_t iops_avg, uint64_t bps_burst, uint64_t bps_avg, std::string& type)
   {
-    return ictx->operations->qos_set(iops_burst, iops_avg, bps_burst, bps_avg);
+    return ictx->operations->qos_set(iops_burst, iops_avg, bps_burst, bps_avg, type);
   }
 
   struct CopyProgressCtx {

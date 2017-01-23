@@ -256,8 +256,8 @@ public:
   int snap_is_protected(const char *snap_name, bool *is_protected);
   int snap_set(const char *snap_name);
   int snap_rename(const char *srcname, const char *dstname);
-  int qos_set(uint64_t iops_burst, uint64_t iops_avg, uint64_t bps_burst, uint64_t bps_avg);
-  int qos_get(uint64_t *iops_burst, uint64_t *iops_avg, uint64_t *bps_burst, uint64_t *bps_avg);
+  int qos_set(uint64_t iops_burst, uint64_t iops_avg, uint64_t bps_burst, uint64_t bps_avg, std::string& type);
+  int qos_get(uint64_t *iops_burst, uint64_t *iops_avg, uint64_t *bps_burst, uint64_t *bps_avg, std::string *type);
 
   /* I/O */
   ssize_t read(uint64_t ofs, size_t len, ceph::bufferlist& bl);

@@ -21,14 +21,14 @@ class QosRequest : public Request<ImageCtxT> {
 public:
   QosRequest(ImageCtxT &image_ctx, Context *on_finish,
 		       uint64_t iops_burst, uint64_t iops_avg,
-		       uint64_t bps_burst, uint64_t bps_avg);
+		       uint64_t bps_burst, uint64_t bps_avg, std::string& type);
 
 protected:
   virtual void send_op();
   virtual bool should_complete(int r);
 
   virtual journal::Event create_event(uint64_t op_tid) const {
-    return journal::QosSetEvent(op_tid, m_iops_burst, m_iops_avg, m_bps_burst, m_bps_avg);
+    return journal::QosSetEvent(op_tid, m_iops_burst, m_iops_avg, m_bps_burst, m_bps_avg, m_type);
   }
 
 private:
@@ -36,6 +36,7 @@ private:
   uint64_t m_iops_avg;
   uint64_t m_bps_burst;
   uint64_t m_bps_avg;
+  std::string m_type;
 
   bool m_requests_blocked = false;
   bool m_writes_blocked = false;

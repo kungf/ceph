@@ -87,7 +87,7 @@ struct ExecuteOp : public Context {
 
 
   void execute(const journal::QosSetEvent &_) {
-    image_ctx.operations->execute_qos_set(event.iops_burst, event.iops_avg, event.bps_burst, event.bps_avg, on_op_complete);
+    image_ctx.operations->execute_qos_set(event.iops_burst, event.iops_avg, event.bps_burst, event.bps_avg, event.type, on_op_complete);
   }
 
   virtual void finish(int r) override {

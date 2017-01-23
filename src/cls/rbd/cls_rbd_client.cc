@@ -660,8 +660,9 @@ namespace librbd {
       op->exec("rbd", "set_protection_status", in);
     }
 
-    void qos_get_start(librados::ObjectReadOperation *op) {
+    void qos_get_start(librados::ObjectReadOperation *op, std::string *type) {
       bufferlist empty_bl;
+      ::encode(*type, empty_bl);
       op->exec("rbd", "qos_get", empty_bl);
     }
 
@@ -682,10 +683,10 @@ namespace librbd {
 
     int qos_get(librados::IoCtx *ioctx, const std::string &oid,
 		uint64_t *iops_burst, uint64_t *iops_avg,
-	        uint64_t *bps_burst, uint64_t *bps_avg)
+	        uint64_t *bps_burst, uint64_t *bps_avg, std::string *type)
     {
       librados::ObjectReadOperation op;
-      qos_get_start(&op);
+      qos_get_start(&op, type);
 
       bufferlist out_bl;
       int r = ioctx->operate(oid, &op, &out_bl);
@@ -699,13 +700,14 @@ namespace librbd {
 
     void qos_set(librados::ObjectWriteOperation *op,
 		  uint64_t iops_burst, uint64_t iops_avg,
-		  uint64_t bps_burst, uint64_t bps_avg)
+		  uint64_t bps_burst, uint64_t bps_avg, std::string& type)
     {
       bufferlist in;
       ::encode(iops_burst, in);
       ::encode(iops_avg, in);
       ::encode(bps_burst, in);
       ::encode(bps_avg, in);
+      ::encode(type, in);
       op->exec("rbd", "qos_set", in);
     }
 
