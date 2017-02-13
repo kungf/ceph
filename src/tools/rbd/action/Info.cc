@@ -73,6 +73,10 @@ static int do_show_info(const char *imgname, librbd::Image& image,
   bool snap_protected = false;
   librbd::mirror_image_info_t mirror_image;
   int r;
+  uint64_t iops_burst, iops_avg, bps_burst, bps_avg;
+  uint64_t read_iops_burst, read_iops_avg, read_bps_burst, read_bps_avg;
+  uint64_t write_iops_burst, write_iops_avg, write_bps_burst, write_bps_avg;
+  std::string type="all", read_type="read", write_type="write";
 
   r = image.stat(info, sizeof(info));
   if (r < 0)
@@ -112,6 +116,24 @@ static int do_show_info(const char *imgname, librbd::Image& image,
   strncpy(prefix, info.block_name_prefix, RBD_MAX_BLOCK_NAME_SIZE);
   prefix[RBD_MAX_BLOCK_NAME_SIZE] = '\0';
 
+  r = image.qos_get(&iops_burst, &iops_avg, &bps_burst, &bps_avg, &type);
+  if (r < 0) {
+    std::cerr << "failed to get qos: " << cpp_strerror(r) << std::endl;
+    return r;
+  }
+
+  r = image.qos_get(&read_iops_burst, &read_iops_avg, &read_bps_burst, &read_bps_avg, &read_type);
+  if (r < 0) {
+    std::cerr << "failed to get qos: " << cpp_strerror(r) << std::endl;
+    return r;
+  }
+
+  r = image.qos_get(&write_iops_burst, &write_iops_avg, &write_bps_burst, &write_bps_avg, &write_type);
+  if (r < 0) {
+    std::cerr << "failed to get qos: " << cpp_strerror(r) << std::endl;
+    return r;
+  }
+
   if (f) {
     f->open_object_section("image");
     f->dump_string("name", imgname);
@@ -121,7 +143,81 @@ static int do_show_info(const char *imgname, librbd::Image& image,
     f->dump_unsigned("object_size", info.obj_size);
     f->dump_string("block_name_prefix", prefix);
     f->dump_int("format", (old_format ? 1 : 2));
+    f->dump_unsigned("iops_avg", iops_avg);
+    f->dump_unsigned("read_iops_avg", read_iops_avg);
+    f->dump_unsigned("write_iops_avg", write_iops_avg);
+    f->dump_unsigned("iops_burst", iops_avg);
+    f->dump_unsigned("read_iops_burst", read_iops_avg);
+    f->dump_unsigned("write_iops_burst", write_iops_avg);
+    f->dump_unsigned("bps_avg", bps_avg);
+    f->dump_unsigned("read_bps_avg", read_bps_avg);
+    f->dump_unsigned("write_bps_avg", write_bps_avg);
+    f->dump_unsigned("bps_burst", bps_avg);
+    f->dump_unsigned("read_bps_burst", read_bps_avg);
+    f->dump_unsigned("write_bps_burst", write_bps_avg);
   } else {
+
+    std::ostringstream s_iops, s_read_iops, s_write_iops,s_bps, s_read_bps, s_write_bps;
+    std::string s_iops_avg, s_read_iops_avg, s_write_iops_avg;
+    std::string s_bps_avg, s_read_bps_avg, s_write_bps_avg;
+    std::ostringstream ss_iops, ss_read_iops, ss_write_iops,ss_bps, ss_read_bps, ss_write_bps;
+    std::string s_iops_burst, s_read_iops_burst, s_write_iops_burst;
+    std::string s_bps_burst, s_read_bps_burst, s_write_bps_burst;
+    if (read_iops_avg == UINT64_MAX){
+        s_read_iops_avg = "unlimited";
+        s_read_iops_burst = "unlimited";
+    } else {
+        s_read_iops << read_iops_avg;
+        s_read_iops_avg = s_read_iops.str();
+        ss_read_iops << read_iops_burst;
+        s_read_iops_burst = ss_read_iops.str();
+      }
+    if (write_iops_avg == UINT64_MAX){
+        s_write_iops_avg = "unlimited";
+        s_write_iops_burst = "unlimited";
+    } else {
+        s_write_iops << write_iops_avg;
+        s_write_iops_avg = s_write_iops.str();
+        ss_write_iops << write_iops_burst;
+        s_write_iops_burst = ss_write_iops.str();
+    }
+    if (iops_avg == UINT64_MAX){
+        s_iops_avg = "unlimited";
+        s_iops_burst = "unlimited";
+    } else {
+        s_iops << iops_avg;
+        s_iops_avg = s_iops.str();
+        ss_iops << iops_burst;
+        s_iops_burst = ss_iops.str();
+    }
+
+    if (read_bps_avg == UINT64_MAX){
+        s_read_bps_avg = "unlimited";
+        s_read_bps_burst = "unlimited";
+    } else {
+        s_read_bps << prettybyte_t(read_bps_avg);
+        s_read_bps_avg = s_read_bps.str();
+        ss_read_bps << prettybyte_t(read_bps_burst);
+        s_read_bps_burst = ss_read_bps.str();
+      }
+    if (write_bps_avg == UINT64_MAX){
+        s_write_bps_avg = "unlimited";
+        s_write_bps_burst = "unlimited";
+    } else {
+        s_write_bps << prettybyte_t(write_bps_avg);
+        s_write_bps_avg = s_write_bps.str();
+        ss_write_bps << prettybyte_t(write_bps_burst);
+        s_write_bps_burst = ss_write_bps.str();
+    }
+    if (bps_avg == UINT64_MAX){
+        s_bps_avg = "unlimited";
+        s_bps_burst = "unlimited";
+    } else {
+        s_bps << prettybyte_t(bps_avg);
+        s_bps_avg = s_bps.str();
+        ss_bps << prettybyte_t(bps_burst);
+        s_bps_burst = ss_bps.str();
+    }
     std::cout << "rbd image '" << imgname << "':\n"
               << "\tsize " << prettybyte_t(info.size) << " in "
               << info.num_objs << " objects"
@@ -132,6 +228,14 @@ static int do_show_info(const char *imgname, librbd::Image& image,
               << "\tblock_name_prefix: " << prefix
               << std::endl
               << "\tformat: " << (old_format ? "1" : "2")
+              << std::endl
+              <<"\tiops avg:" << "read " << s_read_iops_avg << ", write " << s_write_iops_avg << ", all " << s_iops_avg
+              << std::endl
+              <<"\tiops burst:" << "read " << s_read_iops_burst << ", write " << s_write_iops_burst << ", all " << s_iops_burst
+              << std::endl
+              <<"\tbps avg:" << "read " << s_read_bps_avg << ", write " << s_write_bps_avg << ", all " << s_bps_avg
+              << std::endl
+              <<"\tbps burst:" << "read " << s_read_bps_burst << ", write " << s_write_bps_burst << ", all " << s_bps_burst
               << std::endl;
   }
 
