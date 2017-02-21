@@ -86,6 +86,10 @@ namespace librbd {
     TokenBucketThrottle *m_iops_throttle;
     TokenBucketThrottle *m_read_iops_throttle;
     TokenBucketThrottle *m_write_iops_throttle;
+
+    TokenBucketThrottle *m_bps_throttle;
+    TokenBucketThrottle *m_read_bps_throttle;
+    TokenBucketThrottle *m_write_bps_throttle;
     /**
      * Lock ordering:
      *

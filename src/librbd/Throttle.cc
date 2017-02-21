@@ -120,8 +120,25 @@ bool Bucket::get(uint64_t c)
   bool waited = false;
   {
     Mutex::Locker l(lock);
-    waited = _wait(c);
-    remain.sub(c);
+    uint64_t cur, sum;
+    cur = remain.read();
+    sum = 0;
+    if (cur >= 0 && cur < c) {
+        while (sum < c) {
+          waited = _wait(0);
+          cur = remain.read();
+          if (sum + cur <= c) {
+            remain.sub(cur);
+            sum += cur;
+          } else {
+            remain.sub(c - sum);
+            sum = c;
+          }
+        }
+    } else if (cur >= c) {
+      waited = _wait(c);
+      remain.sub(c);
+    }
   }
   return waited;
 }

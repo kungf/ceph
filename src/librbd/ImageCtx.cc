@@ -188,6 +188,9 @@ struct C_InvalidateCache : public Context {
     m_read_iops_throttle = new TokenBucketThrottle(cct, 0, 0);
     m_write_iops_throttle = new TokenBucketThrottle(cct, 0, 0);
 
+    m_bps_throttle = new TokenBucketThrottle(cct, 0, 0);
+    m_read_bps_throttle = new TokenBucketThrottle(cct, 0, 0);
+    m_write_bps_throttle = new TokenBucketThrottle(cct, 0, 0);
     aio_work_queue = new AioImageRequestWQ(this, "librbd::aio_work_queue",
                                            cct->_conf->rbd_op_thread_timeout,
                                            thread_pool_singleton);
@@ -234,6 +237,13 @@ struct C_InvalidateCache : public Context {
       delete m_read_iops_throttle;
     if (m_write_iops_throttle != NULL)
       delete m_write_iops_throttle;
+
+    if (m_bps_throttle != NULL)
+      delete m_bps_throttle;
+    if (m_read_bps_throttle != NULL)
+      delete m_read_bps_throttle;
+    if (m_write_bps_throttle != NULL)
+      delete m_write_bps_throttle;
     delete journal_policy;
     delete exclusive_lock_policy;
     delete op_work_queue;
@@ -631,12 +641,18 @@ struct C_InvalidateCache : public Context {
     if (type == "read"){
       m_read_iops_throttle->set_max(iops_burst);
       m_read_iops_throttle->set_avg(iops_avg);
+      m_read_bps_throttle->set_max(bps_burst);
+      m_read_bps_throttle->set_avg(bps_avg);
     }else if(type == "write"){
       m_write_iops_throttle->set_max(iops_burst);
       m_write_iops_throttle->set_avg(iops_avg);
+      m_write_bps_throttle->set_max(bps_burst);
+      m_write_bps_throttle->set_avg(bps_avg);
     }else{
       m_iops_throttle->set_max(iops_burst);
       m_iops_throttle->set_avg(iops_avg);
+      m_bps_throttle->set_max(bps_burst);
+      m_bps_throttle->set_avg(bps_avg);
     }
   }
 
