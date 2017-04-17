@@ -273,10 +273,18 @@ OSDService::OSDService(OSD *osd) :
 #endif
 {
   objecter->init();
+  recovery_bps_throttle = new TokenBucketThrottle(cct, 0, 0);
+  uint64_t bps = cct->_conf->osd_recovery_bps;
+  if (bps > 0) {
+   recovery_bps_throttle->set_max(bps);
+   recovery_bps_throttle->set_avg(bps);
+  }
 }
 
 OSDService::~OSDService()
 {
+  if (recovery_bps_throttle != NULL)
+    delete recovery_bps_throttle;
   delete objecter;
 }
 
@@ -8917,6 +8925,7 @@ const char** OSD::get_tracked_conf_keys() const
     "osd_pg_epoch_persisted_max_stale",
     "osd_disk_thread_ioprio_class",
     "osd_disk_thread_ioprio_priority",
+    "osd_recovery_bps",
     // clog & admin clog
     "clog_to_monitors",
     "clog_to_syslog",
@@ -8965,6 +8974,10 @@ void OSD::handle_conf_change(const struct md_config_t *conf,
     service.map_cache.set_size(cct->_conf->osd_map_cache_size);
     service.map_bl_cache.set_size(cct->_conf->osd_map_cache_size);
     service.map_bl_inc_cache.set_size(cct->_conf->osd_map_cache_size);
+  }
+  if (changed.count("osd_recovery_bps")) {
+    service.recovery_bps_throttle->set_max(cct->_conf->osd_recovery_bps);
+    service.recovery_bps_throttle->set_avg(cct->_conf->osd_recovery_bps);
   }
   if (changed.count("clog_to_monitors") ||
       changed.count("clog_to_syslog") ||

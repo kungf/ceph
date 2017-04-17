@@ -1425,7 +1425,8 @@ ReplicatedPG::ReplicatedPG(OSDService *o, OSDMapRef curmap,
   pending_backfill_updates(hobject_t::Comparator(true)),
   new_backfill(false),
   temp_seq(0),
-  snap_trimmer_machine(this)
+  snap_trimmer_machine(this),
+  osd(o)
 { 
   missing_loc.set_backend_predicates(
     pgbackend->get_is_readable_predicate(),
@@ -10854,6 +10855,10 @@ int ReplicatedPG::recover_backfill(
 	   << (new_backfill ? " new_backfill":"")
 	   << dendl;
   assert(!backfill_targets.empty());
+
+  ObjectContextRef obc1 = get_object_context(backfill_info.begin, false);
+  if (osd->recovery_bps_throttle != NULL)
+    osd->recovery_bps_throttle->get(obc1->obs.oi.size);
 
   // Initialize from prior backfill state
   if (new_backfill) {

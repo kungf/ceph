@@ -233,6 +233,8 @@ struct shard_info_wrapper;
 
      virtual LogClientTemp clog_error() = 0;
 
+     virtual OSDService * get_osd() = 0;
+
      virtual ~Listener() {}
    };
    Listener *parent;

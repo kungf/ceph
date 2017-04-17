@@ -3,7 +3,7 @@
 #include <thread>
 
 #include <boost/bind.hpp>
-#include "librbd/Throttle.h"
+#include "common/BucketThrottle.h"
 #include "common/dout.h"
 #include "common/ceph_context.h"
 #include "common/perf_counters.h"

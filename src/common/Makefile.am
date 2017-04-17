@@ -40,6 +40,7 @@ libcommon_internal_la_SOURCES = \
 	common/RefCountedObj.cc \
 	common/common_init.cc \
 	common/pipe.c \
+        common/BucketThrottle.cc \
 	common/ceph_argparse.cc \
 	common/ceph_context.cc \
 	common/types.cc \
@@ -245,6 +246,7 @@ noinst_HEADERS += \
 	common/common_init.h \
 	common/io_priority.h \
 	common/pipe.h \
+        common/BucketThrottle.h \
 	common/code_environment.h \
 	common/signal.h \
 	common/simple_spin.h \

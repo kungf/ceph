@@ -15,6 +15,7 @@
 #include "common/Readahead.h"
 #include "common/RWLock.h"
 #include "common/snap_types.h"
+#include "common/BucketThrottle.h"
 
 #include "include/buffer_fwd.h"
 #include "include/rbd/librbd.hpp"
@@ -27,7 +28,6 @@
 #include "librbd/AsyncRequest.h"
 #include "librbd/SnapInfo.h"
 #include "librbd/parent_types.h"
-#include "librbd/Throttle.h"
 
 class CephContext;
 class ContextWQ;

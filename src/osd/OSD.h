@@ -28,6 +28,7 @@
 #include "common/LogClient.h"
 #include "common/AsyncReserver.h"
 #include "common/ceph_context.h"
+#include "common/BucketThrottle.h"
 
 #include "os/ObjectStore.h"
 #include "OSDCap.h"
@@ -409,6 +410,7 @@ public:
   LogClient &log_client;
   LogChannelRef clog;
   PGRecoveryStats &pg_recovery_stats;
+  TokenBucketThrottle *recovery_bps_throttle;
 private:
   Messenger *&cluster_messenger;
   Messenger *&client_messenger;

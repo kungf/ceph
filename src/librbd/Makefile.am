@@ -30,7 +30,6 @@ librbd_internal_la_SOURCES = \
 	librbd/ObjectMap.cc \
 	librbd/ObjectWatcher.cc \
 	librbd/Operations.cc \
-	librbd/Throttle.cc \
 	librbd/Utils.cc \
 	librbd/exclusive_lock/AcquireRequest.cc \
 	librbd/exclusive_lock/ReleaseRequest.cc \
@@ -116,7 +115,6 @@ noinst_HEADERS += \
 	librbd/parent_types.h \
 	librbd/SnapInfo.h \
 	librbd/TaskFinisher.h \
-	librbd/Throttle.h \
 	librbd/Utils.h \
 	librbd/WatchNotifyTypes.h \
 	librbd/exclusive_lock/AcquireRequest.h \

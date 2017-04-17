@@ -483,6 +483,8 @@ public:
   ceph_tid_t get_tid() { return osd->get_tid(); }
 
   LogClientTemp clog_error() { return osd->clog->error(); }
+  
+  OSDService *get_osd() override { return osd; }
 
   struct watch_disconnect_t {
     uint64_t cookie;
@@ -1472,6 +1474,7 @@ public:
 	       const PGPool &_pool, spg_t p);
   ~ReplicatedPG() {}
 
+  OSDService *osd;
   int do_command(
     cmdmap_t cmdmap,
     ostream& ss,
