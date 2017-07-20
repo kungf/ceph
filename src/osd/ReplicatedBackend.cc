@@ -89,10 +89,6 @@ void ReplicatedBackend::recover_object(
   dout(10) << __func__ << ": " << hoid << dendl;
   RPGHandle *h = static_cast<RPGHandle *>(_h);
 
-  OSDService *osd = get_parent()->get_osd();
-  if (osd->recovery_bps_throttle != NULL)
-    osd->recovery_bps_throttle->get(obc->obs.oi.size);
-
   if (get_parent()->get_local_missing().is_missing(hoid)) {
     assert(!obc);
     // pull
@@ -2072,6 +2068,11 @@ int ReplicatedBackend::build_push_op(const ObjectRecoveryInfo &recovery_info,
     stat->num_keys_recovered += out_op->omap_entries.size();
     stat->num_bytes_recovered += out_op->data.length();
   }
+
+  OSDService *osd = get_parent()->get_osd();
+  if (osd->recovery_bps_throttle != NULL)
+    osd->recovery_bps_throttle->get( out_op->omap_entries.size() +
+                                     out_op->data.length());
 
   get_parent()->get_logger()->inc(l_osd_push);
   get_parent()->get_logger()->inc(l_osd_push_outb, out_op->data.length());

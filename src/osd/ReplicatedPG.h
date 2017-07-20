@@ -1474,7 +1474,6 @@ public:
 	       const PGPool &_pool, spg_t p);
   ~ReplicatedPG() {}
 
-  OSDService *osd;
   int do_command(
     cmdmap_t cmdmap,
     ostream& ss,
