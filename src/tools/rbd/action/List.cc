@@ -209,7 +209,16 @@ int execute(const po::variables_map &vm) {
   if (r < 0) {
     return r;
   }
-
+  std::list<std::string> pools;
+  rados->pool_list(pools);
+  std::list<std::string>::iterator iter;
+  std::cout << "pool: list: " << std::endl;
+  for (iter = pools.begin(); iter != pools.end(); ++iter)
+  {
+      std::cout << *iter << std::endl;    
+  }
+  
+  
   librbd::RBD rbd;
   r = do_list(rbd, io_ctx, vm["long"].as<bool>(), formatter.get());
   if (r < 0) {
