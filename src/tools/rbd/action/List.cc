@@ -206,27 +206,28 @@ int execute(const po::variables_map &vm) {
   }
 
   librados::Rados rados;
-  librados::IoCtx io_ctx;
-  r = utils::init(pool_name, &rados, &io_ctx);
-  if (r < 0) {
-    return r;
-  }
+
   std::list<std::string> pools;
   rados.pool_list(pools);
   std::list<std::string>::iterator iter;
-  std::cout << "pool: list: " << std::endl;
+  
   for (iter = pools.begin(); iter != pools.end(); ++iter)
   {
-      std::cout << *iter << std::endl;    
-  }
-  
-  
-  librbd::RBD rbd;
-  r = do_list(rbd, io_ctx, vm["long"].as<bool>(), formatter.get());
-  if (r < 0) {
-    std::cerr << "rbd: list: " << cpp_strerror(r) << std::endl;
-    return r;
-  }
+      //std::cout << *iter << std::endl;    
+        pool_name = *iter;
+        std::cout << "pool: " << << pool_name << std::endl;
+        librados::IoCtx io_ctx;
+        r = utils::init(pool_name, &rados, &io_ctx);
+        if (r < 0) {
+                return r;
+        }
+        librbd::RBD rbd;
+        r = do_list(rbd, io_ctx, vm["long"].as<bool>(), formatter.get());
+        if (r < 0) {
+                std::cerr << "rbd: list: " << cpp_strerror(r) << std::endl;
+                return r;
+        }
+ }
 
   return 0;
 }
