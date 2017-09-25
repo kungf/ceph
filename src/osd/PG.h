@@ -1299,6 +1299,11 @@ public:
       return (soid >= start && soid < end);
     }
 
+    void write_async_scrub(const hobject_t &soid) {
+      if (write_blocked_by_scrub(soid))
+        state = NEW_CHUNK;
+    }
+
     // clear all state
     void reset() {
       active = false;

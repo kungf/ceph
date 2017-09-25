@@ -2012,12 +2012,18 @@ void PrimaryLogPG::do_op(OpRequestRef& op)
     return;
   }
 
+/*
   if (write_ordered &&
       scrubber.write_blocked_by_scrub(head)) {
     dout(20) << __func__ << ": waiting for scrub" << dendl;
     waiting_for_scrub.push_back(op);
     op->mark_delayed("waiting for scrub");
     return;
+  }
+  */
+  if (write_ordered) {
+    scrubber.write_async_scrub(head);
+    dout(20) << __func__ << ": write when scrubbing, make scrub new again." << dendl;
   }
 
   // blocked on snap?
