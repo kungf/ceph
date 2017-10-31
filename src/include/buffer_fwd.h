@@ -4,11 +4,13 @@
 namespace ceph {
   namespace buffer {
     class ptr;
+    class pool;
     class list;
     class hash;
   }
 
   using bufferptr = buffer::ptr;
+  using bufferpool = buffer::pool;
   using bufferlist = buffer::list;
   using bufferhash = buffer::hash;
 }

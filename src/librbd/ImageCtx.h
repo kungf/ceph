@@ -87,7 +87,7 @@ namespace librbd {
     IoCtx data_ctx, md_ctx;
     ImageWatcher<ImageCtx> *image_watcher;
     Journal<ImageCtx> *journal;
-
+    bufferpool raws_pool;
     /**
      * Lock ordering:
      *
@@ -112,7 +112,6 @@ namespace librbd {
     Mutex async_ops_lock; // protects async_ops and async_requests
     Mutex copyup_list_lock; // protects copyup_waiting_list
     Mutex completed_reqs_lock; // protects completed_reqs
-
     unsigned extra_read_flags;
 
     bool old_format;

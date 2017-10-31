@@ -62,11 +62,15 @@ namespace {
 
 TracepointProvider::Traits tracepoint_traits("librbd_tp.so", "rbd_tracing");
 
-buffer::raw* create_write_raw(librbd::ImageCtx *ictx, const char *buf,
+buffer::ptr& create_write_raw(librbd::ImageCtx *ictx, const char *buf,
                               size_t len) {
   // TODO: until librados can guarantee memory won't be referenced after
   // it ACKs a request, always make a copy of the user-provided memory
-  return buffer::copy(buf, len);
+
+  buffer::ptr praw = ictx->raws_pool.get(len)
+  memcpy(praw._raw->data, buf, len)
+
+  return praw;
 }
 
 CephContext* get_cct(IoCtx &io_ctx) {

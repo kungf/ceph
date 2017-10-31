@@ -172,7 +172,6 @@ namespace buffer CEPH_BUFFER_API {
   class CEPH_BUFFER_API ptr {
     raw *_raw;
     unsigned _off, _len;
-
     void release();
 
   public:
@@ -340,6 +339,32 @@ namespace buffer CEPH_BUFFER_API {
 
   };
 
+  class CEPH_BUFFER_API pool {
+    Mutex lock;
+    using ptr_map_t std::multimap<size_t, ptr>;
+    ptr_map_t _ptrs;
+    pool():lock(util::unique_lock_name("buffer::pool::lock", this)){}
+    ~pool(){}
+
+    ptr get(size_t len){
+      Mutex lock(lock);
+      ptr_map_t::iterator it;
+      it = _ptrs.lower_bound(len);
+      while (it != _ptrs.end()) {
+        if (it->second.raw_nref() == 1) {
+          break;
+        }
+        ++it;
+      }
+
+      if(it == _ptrs.end()) {
+        raw* r = buffer::create_aligned(len, sizeof(size_t));
+        it = _ptrs.insert(ptr_map_t::value_type(len, ptr(r)))
+      }
+      return it->second;
+    }
+
+  };
 
   /*
    * list - the useful bit!
